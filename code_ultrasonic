@@ -1,4 +1,4 @@
-int A1;
+int A3;
 
 void setup() {  // put your setup code here, to run once:
   Serial.begin(9600);
@@ -6,7 +6,7 @@ void setup() {  // put your setup code here, to run once:
 }
 
 void loop() {
- A1 = analogRead(1);
+ A3 = analogRead(1);
  // A1 *= scale;
   Serial.print(A1)
   Serial.println("mm");
