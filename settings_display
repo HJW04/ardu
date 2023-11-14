@@ -1,8 +1,0 @@
-보드 - 변환모듈 - LCD 연결****************
-GND - GND
-VCC - 5V
-SDA(data) - A4
-SCL(clock) - A5
-
-IDE***********************************
-code_display 업로드
