@@ -25,7 +25,7 @@ void loop(){
   lcd.print("A0: ")
   lcd.print(A0);
   
-  // 3.7V 배터리 전압 최고 4.2, 최소 2.4
+  // 3.7V 배터리 전압 최고 4.2, 방전시 최소 2.4
   float v = A0 * (4.2/1024);  
   lcd.setCursor(8,0); 
   lcd.print(v);
