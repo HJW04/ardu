@@ -8,10 +8,10 @@
 
 FirebaseData firebaseData
 
-void setup() {  // put your setup code here, to run once:
+void setup() {
   Serial.begin(115200);
 
-  // 15 ~ 26: wifi 접속
+  // wifi 접속
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.println();
   Serial.print( "Connecting to Wi-Fi ");
@@ -25,7 +25,7 @@ void setup() {  // put your setup code here, to run once:
   Serial.println(WiFi.localIP());
   Serial.println();
 
-  // 29 ~ 35: firebase 접속 및 기본설정
+  // firebase 접속 및 기본설정
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
 
@@ -37,6 +37,5 @@ void setup() {  // put your setup code here, to run once:
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   
 }
