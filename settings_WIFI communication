@@ -1,10 +1,22 @@
 firebase************************
 firebase 가입
-프로젝트 생성
-realtime database 생성
+프로젝트 A 생성
+realtime database 시작
+
+규칙 - (코드수정: database 수정가능으로 설정변경)
+".read": true,
+".write": true
+
+
 
 
 앱인벤터*****************************
+앱인벤터 가입
+새 프로젝트 B 시작
+팔레트 - 실험 - FirebaseDB - 컴포넌트 - FirebaseDB1 - 속성 
+- firebaseToken: 키 값 입력 (위치: firebase - 프로젝트 A - 프로젝트 설정 - 일반 - 웹 API 키)
+- firebaseURL: URL 입력 (위치: firebase - 프로젝트 A - Realtime Database - "https: ~ .com"
+
 보드 세팅***********************************
 
 ESP-01를 핀이 왼쪽에 보이게 눕히고 각 핀을
