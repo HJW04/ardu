@@ -1,0 +1,44 @@
+// #include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27,16,2);    // 주소 0x27, 16x2 디스플레이
+
+float A0;  // A0 입력값
+float v;  // 전압
+float p;  // 잔량 %
+
+void setup(){
+
+  // lcd.begin(16,2);
+  lcd.init();
+  lcd.backlight();
+
+  // 시리얼 통신, baud rate = 9600 bits / sec
+  // Serial.begin(9600);
+  
+}
+void loop(){
+
+  // 아날로그 핀 입력값 = 0 ~ 1024
+  float A0 = analogRead(A0);
+  lcd.setCursor(0,0); 
+  lcd.print("A0: ")
+  lcd.print(A0);
+  
+  // 3.7V 배터리 전압 최고 4.2, 최소 2.4
+  float v = A0 * (4.2/1024);  
+  lcd.setCursor(8,0); 
+  lcd.print(v);
+  lcd.print("V")
+
+  // 배터리 잔량
+  float p = (v-2.4) / (4.2-2.4);
+  lcd.setCursor(0,1); 
+  lcd.print(p);
+  lcd.print("%")
+
+  delay(900);       // ( ) msec 동안 표시
+  lcd.clear();
+  //lcd.noBacklight();
+  delay(100);       // ( ) msec 동안 clear
+}
