@@ -1,6 +1,6 @@
 int A3;
 int trig, echo;
-float FTT, dst;
+float RTT, dst;
 
 void setup() {  // put your setup code here, to run once:
   Serial.begin(9600);
@@ -11,9 +11,9 @@ void setup() {  // put your setup code here, to run once:
 void loop() {
 
 // 측정된 거리값 시리얼 출력
- A3 = analogRead(1);
+ A3 = analogRead(3);
  // A1 *= scale;
-  Serial.print(A1)
+  Serial.print(A3)
   Serial.println("mm");
   
 // initial
