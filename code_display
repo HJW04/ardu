@@ -20,22 +20,22 @@ void setup(){
 void loop(){
 
   // 아날로그 핀 입력값 = 0 ~ 1024
-  float A0 = analogRead(A0);
+  float A0 = analogRead(0);
   lcd.setCursor(0,0); 
   lcd.print("A0: ")
   lcd.print(A0);
   
   // 3.7V 배터리 전압 최고 4.2, 방전시 최소 2.4
   float v = A0 * (4.2/1024);  
-  lcd.setCursor(8,0); 
+  lcd.setCursor(0,1); 
   lcd.print(v);
-  lcd.print("V")
+  lcd.print("V");
 
   // 배터리 잔량
   float p = (v-2.4) / (4.2-2.4);
-  lcd.setCursor(0,1); 
+  lcd.setCursor(8,1); 
   lcd.print(p);
-  lcd.print("%")
+  lcd.print("%");
 
   delay(900);       // ( ) msec 동안 표시
   lcd.clear();
