@@ -78,7 +78,7 @@ void printLcd(){
 
   lcd.setCursor(0, 1);
   lcd.print("VOLTAGE");
-  //lcd.print(temp);  //읽은 문자를 lcd 2번째줄 첫번째 칸부터 써라.
+  //lcd.print(buff);  //읽은 문자를 lcd 2번째줄 첫번째 칸부터 써라.
   delay(500);
 }
 
