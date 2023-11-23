@@ -49,53 +49,53 @@ void setup() {
   lcd.backlight();
 }
 void callfirebase(){
-  float voltage = voltage_func();
-  float percent = percent_func();
+  float voltage = getVoltage();
+  float percent = getPercent();
   Firebase.setFloat(firebaseData, "VOLTAGE", voltage);
   Firebase.setFloat(firebaseData, "PERCENT", percent);
 }
 
 void turnlcd(){
   lcd.clear();                //화면을 지운다.
-  float volt = analogRead(A0);  //0-1023 사이의 수치가 A0으로 들어옴.
+  float volt = analogRead(0);  //0-1023 사이의 수치가 A0으로 들어옴.
   Serial.print(volt);
   Serial.print(',');                  //Serial monitor로 값이 들어오는지 확인.
   float voltage = 4.2 * volt / (1024);  //analog수치를 디지털 수치로 바꿈.
   Serial.print(voltage);
   Serial.print(',');  //Serial monitor로 확인.
 
-  //char temp[] = {};
+  char buff[] = {};
 
-  sprintf(temp, "VOLTAGE %02d.%02d V", (int)voltage, (int)(voltage * 100) % 100);
+  sprintf(buff, "VOLTAGE %02d.%02d V", (int)voltage, (int)(voltage * 100) % 100);
 
   lcd.setCursor(0, 0);
-  //lcd.print(temp);  //LCD 첫번째 줄 첫번째칸부터 VOLTAGE 뜨게 하기.
-  lcd.print("Hello World!");
+  lcd.print(buff);  //LCD 첫번째 줄 첫번째칸부터 VOLTAGE 뜨게 하기.
+  
   float percent = 100 * voltage / (4.2);
   Serial.print(percent);
   Serial.println("%");
-  sprintf(temp, "BATTERY %02d.%02d %%", (int)percent, (int)(percent * 100) % 100);
+  sprintf(buff, "BATTERY %02d.%02d %%", (int)percent, (int)(percent * 100) % 100);
 
   lcd.setCursor(0, 1);
   lcd.print("VOLTAGE");
   //lcd.print(temp);  //읽은 문자를 lcd 2번째줄 첫번째 칸부터 써라.
-  delay(1000);
+  delay(500);
 }
 
-float voltage_func(){
-  float volt = analogRead(A0);
-  float voltage = 4.2* volt / (1024);
+float getVoltage(){
+  float volt = analogRead(0);
+  float voltage = 4.2 * volt / (1024);
   return voltage;
 }
 
-float percent_func(){
-  float volt = analogRead(A0);
+float getPercent(){
+  float volt = analogRead(0);
   float voltage = 4.2 * volt / (1024);
   float percent = 100 * voltage / (4.2);
   return percent;
 }
 
-float distance_func(){
+float getDistance(){
   float duration;
   float distance;
   digitalWrite(Trig,LOW);
@@ -116,7 +116,7 @@ float distance_func(){
 void loop() {
   turnlcd();
   float distance;
-  distance = distance_func();
+  distance = getDistance();
   //if (distance < 30){
   //  callfirebase();
   //}
