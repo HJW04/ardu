@@ -5,8 +5,8 @@
 
 #define FIREBASE_HOST "skku-team5-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "MMXM31jWhdTJAk1R2VL4rRgKbl6eScjLjpyj0sHM"
-#define WIFI_SSID "Galaxy Z Flip 5GF5_42_51"   //Galaxy Z Flip 5GF5_42_51
-#define WIFI_PASSWORD "28916195"  //wifi 비밀번호  28916195
+#define WIFI_SSID "iptime5G"   // wifi 이름: Galaxy Z Flip 5GF5_42_51
+#define WIFI_PASSWORD "42352423"  //wifi 비밀번호: 28916195
 
 #define Trig D2
 #define Echo D8
@@ -55,7 +55,7 @@ void callfirebase(){
   Firebase.setFloat(firebaseData, "PERCENT", percent);
 }
 
-void turnlcd(){
+void printLcd(){
   lcd.clear();                //화면을 지운다.
   float volt = analogRead(0);  //0-1023 사이의 수치가 A0으로 들어옴.
   Serial.print(volt);
@@ -114,7 +114,7 @@ float getDistance(){
 }
 
 void loop() {
-  turnlcd();
+  printLcd();
   float distance;
   distance = getDistance();
   //if (distance < 30){
