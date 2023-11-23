@@ -45,7 +45,7 @@ void setup() {
   Firebase.setReadTimeout(firebaseData, 1000 * 60);
   Firebase.setwriteSizeLimit(firebaseData, "tiny");
 
-  lcd.begin();
+  lcd.init();
   lcd.backlight();
 }
 void callfirebase(){
