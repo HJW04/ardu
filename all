@@ -1,0 +1,128 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <ESP8266WiFi.h>
+#include "FirebaseESP8266.h"
+
+#define FIREBASE_HOST "skku-team5-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH "MMXM31jWhdTJAk1R2VL4rRgKbl6eScjLjpyj0sHM"
+#define WIFI_SSID "Galaxy Z Flip 5GF5_42_51"   //Galaxy Z Flip 5GF5_42_51
+#define WIFI_PASSWORD "28916195"  //wifi 비밀번호  28916195
+
+#define Trig D2
+#define Echo D8
+
+FirebaseData firebaseData;
+FirebaseJson json;
+
+void printResult(FirebaseData &data);
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+
+void setup() {
+
+  Serial.begin(9600);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.println();
+  Serial.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println();
+  Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.println();
+
+  pinMode(Trig, OUTPUT);
+  pinMode(Echo, INPUT);
+
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  Firebase.reconnectWiFi(true);
+
+  firebaseData.setBSSLBufferSize(1024, 1024);
+  firebaseData.setResponseSize(1024);
+  Firebase.setReadTimeout(firebaseData, 1000 * 60);
+  Firebase.setwriteSizeLimit(firebaseData, "tiny");
+
+  lcd.begin();
+  lcd.backlight();
+}
+void callfirebase(){
+  float voltage = voltage_func();
+  float percent = percent_func();
+  Firebase.setFloat(firebaseData, "VOLTAGE", voltage);
+  Firebase.setFloat(firebaseData, "PERCENT", percent);
+}
+
+void turnlcd(){
+  lcd.clear();                //화면을 지운다.
+  float volt = analogRead(A0);  //0-1023 사이의 수치가 A0으로 들어옴.
+  Serial.print(volt);
+  Serial.print(',');                  //Serial monitor로 값이 들어오는지 확인.
+  float voltage = 4.2 * volt / (1024);  //analog수치를 디지털 수치로 바꿈.
+  Serial.print(voltage);
+  Serial.print(',');  //Serial monitor로 확인.
+
+  //char temp[] = {};
+
+  sprintf(temp, "VOLTAGE %02d.%02d V", (int)voltage, (int)(voltage * 100) % 100);
+
+  lcd.setCursor(0, 0);
+  //lcd.print(temp);  //LCD 첫번째 줄 첫번째칸부터 VOLTAGE 뜨게 하기.
+  lcd.print("Hello World!");
+  float percent = 100 * voltage / (4.2);
+  Serial.print(percent);
+  Serial.println("%");
+  sprintf(temp, "BATTERY %02d.%02d %%", (int)percent, (int)(percent * 100) % 100);
+
+  lcd.setCursor(0, 1);
+  lcd.print("VOLTAGE");
+  //lcd.print(temp);  //읽은 문자를 lcd 2번째줄 첫번째 칸부터 써라.
+  delay(1000);
+}
+
+float voltage_func(){
+  float volt = analogRead(A0);
+  float voltage = 4.2* volt / (1024);
+  return voltage;
+}
+
+float percent_func(){
+  float volt = analogRead(A0);
+  float voltage = 4.2 * volt / (1024);
+  float percent = 100 * voltage / (4.2);
+  return percent;
+}
+
+float distance_func(){
+  float duration;
+  float distance;
+  digitalWrite(Trig,LOW);
+  delay(10);
+  digitalWrite(Trig, HIGH);
+  duration = pulseIn(Echo, HIGH);
+  distance = ((float)(340*duration)/10000)/2;
+  Serial.print("Duration: ");
+  Serial.print(duration);
+  Serial.print("\nDistance: ");
+  Serial.print(distance);
+  Serial.println("cm\n");
+
+  return distance;
+
+}
+
+void loop() {
+  turnlcd();
+  float distance;
+  distance = distance_func();
+  //if (distance < 30){
+  //  callfirebase();
+  //}
+  callfirebase();
+  
+  delay(500);
+
+  
+}
