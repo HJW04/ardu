@@ -18,7 +18,6 @@ FirebaseData firebaseData;
 FirebaseJson json;
 FirebaseConfig config;
 FirebaseAuth auth;
-void printResult(FirebaseData &data);
 
 void setup(){
   Serial.println("setup start");
@@ -69,7 +68,7 @@ float getPercent(float voltage){
   return percent;
 }
 
-void callfirebase(float inputA0, float distance){
+void printFirebase(float inputA0, float distance){
   float voltage = getVoltage(inputA0);
   float percent = getPercent(voltage);
   Firebase.setFloat(firebaseData, "/esp8266/voltage", voltage);
@@ -125,7 +124,7 @@ void loop(){
   
   printLcd(inputA0, distance);
   Serial.println("A");
-  callfirebase(inputA0, distance);
+  printFirebase(inputA0, distance);
 
   delay(2900);       // ( ) msec 동안 표시
   
