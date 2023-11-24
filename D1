@@ -19,10 +19,9 @@ FirebaseConfig config;    // ID 설정
 FirebaseAuth auth;    // PW 설정
 
 void setup(){
+  Serial.begin(115200);   // 시리얼 통신, baud rate = 115200 bits / sec
   Serial.println("setup start");
 
-  Serial.begin(115200);   // 시리얼 통신, baud rate = 9600 bits / sec
-  
   // wifi 연결
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);    
   Serial.println("Connecting to WiFi");
@@ -48,16 +47,15 @@ void setup(){
 
   lcd.init();    // lcd 시작
   lcd.backlight();
-
 }
 
 float getVoltage(float inputA0){
-  float voltage = 4.2 * inputA0 / (1024);  // analog수치를 디지털 수치로 바꿈.
+  float voltage = 4.2 * inputA0 / 1024 ;      // analog수치를 디지털 수치로 바꿈.
   return voltage;
 }
 
 float getPercent(float voltage){
-  float percent = 100 * (voltage-2.4) / (4.2-2.4); // 3.7V 배터리 전압 최고 4.2, 방전시 최소 2.4
+  float percent = 100 * (voltage-2.4) / (4.2-2.4);     // 3.7V 배터리 전압 최고 4.2, 방전시 최소 2.4
   return percent;
 }
 
@@ -65,11 +63,16 @@ void printFirebase(float inputA0, float distance){
   float voltage = getVoltage(inputA0);
   float percent = getPercent(voltage);
 
-  firebase에 데이터 전송 = "키":값
-  Firebase.setFloat(firebaseData, "voltage", voltage);
-  Firebase.setFloat(firebaseData, "percent", percent);
-  if(0.5 < distance && distance < 2){
-    Firebase.setFloat(firebaseData, "distance", percent);
+  //firebase에 데이터 전송, bucket에 key : value 쌍 print
+  Firebase.setFloat(firebaseData, "bucket1/voltage", voltage);    // "bucketName/key", value
+  Firebase.setFloat(firebaseData, "bucket1/percent", percent);
+  
+  
+  if(3 < distance && distance < 4){     // 2cm 이하 측정 잘안됨
+    Firebase.setFloat(firebaseData, "bucket1/distance", distance);
+  }
+  else{
+    Firebase.setFloat(firebaseData, "bucket1/distance", 0);
   }
 }
 
@@ -101,8 +104,9 @@ void printLcd(float inputA0, float distance){
 float getDistance(){
   float duration;
   float distance;
+  digitalWrite(TRIG, LOW);
   digitalWrite(TRIG, HIGH);
-  delay(10);
+  delay(2);
   digitalWrite(TRIG, LOW);
   duration = pulseIn(ECHO, HIGH);
   distance = ((float) (340 * duration) / 10000) / 2;
@@ -113,19 +117,15 @@ float getDistance(){
   Serial.println("cm\n");
 
   return distance;
-
 }
 
 void loop(){
   float inputA0 = analogRead(0);  //0-1024 사이의 수치가 A0으로 들어옴.
   float distance = getDistance();
-  
   printLcd(inputA0, distance);
-  Serial.println("A");
   printFirebase(inputA0, distance);
 
   delay(900);       // ( ) msec 동안 표시
-  
   lcd.clear();
   delay(100);     // ( ) msec 동안 clear
  
