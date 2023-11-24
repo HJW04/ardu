@@ -17,7 +17,7 @@ void loop(){
   // 아날로그 핀 입력값 = 0 ~ 1024
   float A0 = analogRead(0);
   lcd.setCursor(0,0); 
-  lcd.print("A0: ")
+  lcd.print("A0: ");
   lcd.print(A0);
   
   // 3.7V 배터리 전압 최고 4.2, 방전시 최소 2.4
