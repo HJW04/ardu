@@ -24,7 +24,7 @@ void loop(){
   float v = A0 * (4.2/1024);  
   lcd.setCursor(8,0); 
   lcd.print(v);
-  lcd.print("V")
+  lcd.print("V");
 
   // 배터리 잔량
   float p = (v-2.4) / (4.2-2.4);
