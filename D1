@@ -3,9 +3,8 @@
 #include "FirebaseESP8266.h"
 #include <ESP8266WiFi.h>
 
-
-#define ECHO D7
-#define TRIG D6
+#define TRIG D6    // 초음파 방출
+#define ECHO D7    // 초음파 반사 입력
 
 LiquidCrystal_I2C lcd(0x27,16,2);    // 주소 0x27, 16x2 디스플레이
 
@@ -14,48 +13,42 @@ LiquidCrystal_I2C lcd(0x27,16,2);    // 주소 0x27, 16x2 디스플레이
 #define WIFI_SSID "qaqa"   // wifi 이름: Galaxy Z Flip 5GF5_42_51
 #define WIFI_PASSWORD "01042352423p"  //wifi 비밀번호: 28916195
 
-FirebaseData firebaseData;
-FirebaseJson json;
-FirebaseConfig config;
-FirebaseAuth auth;
+FirebaseData firebaseData;    // firebase에 보낼 데이터
+FirebaseJson json;    // 형식
+FirebaseConfig config;    // ID 설정
+FirebaseAuth auth;    // PW 설정
 
 void setup(){
   Serial.println("setup start");
+
   Serial.begin(115200);   // 시리얼 통신, baud rate = 9600 bits / sec
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   
+  // wifi 연결
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);    
   Serial.println("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED) {  // 연결 될때까지 1초간격으로 연결시도
     Serial.print(".");
-    delay(500);
+    delay(1000);
   }
   Serial.println();
   Serial.print("Connected with IP: ");
   Serial.println(WiFi.localIP());
   Serial.println();
 
+  //firebase 연결
   config.database_url = FIREBASE_HOST;
   config.signer.tokens.legacy_token = FIREBASE_AUTH;
-
-  
   Serial.println("Firebase begin");
-  Firebase.reconnectWiFi(true);
+  Firebase.reconnectWiFi(true);    // 재접속 허용 (true/false)
   Firebase.begin(&config, &auth);
-  // firebaseData.setBSSLBufferSize(1024, 1024);
-  // firebaseData.setResponseSize(1024);
-  // Firebase.setReadTimeout(firebaseData, 1000 * 60);
-  // Firebase.setwriteSizeLimit(firebaseData, "tiny");
 
-  // Serial.begin (115200);
-  pinMode(TRIG, OUTPUT);
-  pinMode(ECHO, INPUT);
+  // 초음파 입출력
+  pinMode(TRIG, OUTPUT);    // 초음파 출력
+  pinMode(ECHO, INPUT);    // 초음파 반사 입력
 
   lcd.init();    // lcd 시작
   lcd.backlight();
 
-  
- 
-  
 }
 
 float getVoltage(float inputA0){
@@ -71,8 +64,13 @@ float getPercent(float voltage){
 void printFirebase(float inputA0, float distance){
   float voltage = getVoltage(inputA0);
   float percent = getPercent(voltage);
-  Firebase.setFloat(firebaseData, "/esp8266/voltage", voltage);
-  Firebase.setFloat(firebaseData, "/esp8266/voltage", percent);
+
+  firebase에 데이터 전송 = "키":값
+  Firebase.setFloat(firebaseData, "voltage", voltage);
+  Firebase.setFloat(firebaseData, "percent", percent);
+  if(0.5 < distance && distance < 2){
+    Firebase.setFloat(firebaseData, "distance", percent);
+  }
 }
 
 void printLcd(float inputA0, float distance){
@@ -126,11 +124,9 @@ void loop(){
   Serial.println("A");
   printFirebase(inputA0, distance);
 
-  delay(2900);       // ( ) msec 동안 표시
+  delay(900);       // ( ) msec 동안 표시
   
   lcd.clear();
   delay(100);     // ( ) msec 동안 clear
  
-
-      
 }
