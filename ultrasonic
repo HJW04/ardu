@@ -1,17 +1,16 @@
-#define echo D7
 #define trig D6
- 
- 
+#define echo D7
+
 void setup() {
   Serial.begin (115200);
-  pinMode(trig, OUTPUT);
-  pinMode(echo, INPUT);
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
 }
  
 void loop() {
-  digitalWrite(trig,HIGH);
-  delay(10);
-  digitalWrite(trig, LOW);
+  digitalWrite(TRIG,HIGH);
+  delay(1);
+  digitalWrite(ECHO, LOW);
  
   float duration = pulseIn(echo, HIGH);
   float distance = ((float)(340 * duration) / 10000)/2;
@@ -22,6 +21,5 @@ void loop() {
   Serial.print(distance);
   Serial.println("cm/n");
  
-  delay(500);
+  delay(1000);
 }
-[출처] [아두이노/Arduino] WeMos D1 wifi + ultrasonic sensor(초음파 센서)|작성자 뚜이
