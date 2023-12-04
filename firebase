@@ -1,0 +1,50 @@
+#include "FirebaseESP8266.h"
+#include <ESP8266WiFi.h>
+
+// 소스: 파이어베이스 - 프로젝트 - 실시간 데이터베이스 - URL에서 "https://" 이후 ~ .com 까지
+#define FIREBASE_HOST "esp8266firebase-c0d21-default-rtdb.firebaseio.com"    //"skku-team5-default-rtdb.firebaseio.com"
+// 소스: 파이어베이스 - 프로젝트 - 프로젝트 설정 - 서비스계정 - 데이터베이스 비밀번호 - 보안비밀
+#define FIREBASE_AUTH "H1LIBMkrhFGq0gaONtIso13ad7RACrtjdxboJwUN"          // "MMXM31jWhdTJAk1R2VL4rRgKbl6eScjLjpyj0sHM" 
+#define WIFI_SSID "Galaxy Z Flip 5GF5_42_51"   // wifi 이름: qaqa
+#define WIFI_PASSWORD "28916195"  //wifi 비밀번호: 01042352423p
+
+FirebaseData firebaseData;    // firebase에 보낼 데이터
+FirebaseJson json;    // 형식
+FirebaseConfig config;    // ID 설정
+FirebaseAuth auth;    // PW 설정
+
+void setup(){
+  Serial.begin(115200);   // 시리얼 통신, baud rate = 115200 bits / sec
+  Serial.println("setup start");
+
+  // wifi 연결
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);    
+  Serial.println("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {  // 연결 될때까지 1초간격으로 연결시도
+    Serial.print(".");
+    delay(1000);
+  }
+  Serial.println();
+  Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.println();
+
+  //firebase 연결
+  config.database_url = FIREBASE_HOST;    // 파이어 베이스 프로젝트 URL
+  config.signer.tokens.legacy_token = FIREBASE_AUTH;  // 파이어베이스 프로젝트 토큰 or 보안비밀
+  Serial.println("Firebase begin");
+  Firebase.reconnectWiFi(true);    // 재접속 허용 (true/false)
+  Firebase.begin(&config, &auth);
+}
+
+void printFirebase(){
+  //firebase에 데이터 전송, bucket에 [key : value] 쌍 print ("실시간 데이터베이스" 에서 확인)
+  Firebase.setFloat(firebaseData, "bucket1/voltage", 12.34);    // "bucketName/key", value
+  Firebase.setFloat(firebaseData, "bucket1/percent", 67.89);
+}
+
+void loop(){
+  printFirebase();
+  delay(900);       // ( ) msec 동안 표시
+  delay(100);     // ( ) msec 동안 clear
+}
