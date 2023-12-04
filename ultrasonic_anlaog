@@ -1,0 +1,36 @@
+int A3;
+int trig, echo;
+float FTT, dst;
+
+void setup() {  // put your setup code here, to run once:
+  Serial.begin(9600);
+  pinmode(trig, OUTPUT);
+  pinmode(echo, INPUT);
+}
+
+void loop() {
+
+// 측정된 거리값 시리얼 출력
+ A3 = analogRead(1);
+ // A1 *= scale;
+  Serial.print(A1)
+  Serial.println("mm");
+  
+// initial
+digitalWrite(trig, LOW);
+digitalWrite(echo, LOW);
+
+// emission
+digitalWrite(trig, HIGH);
+delay(1);
+digitalWrite(trig, LOW);
+
+// 시간, 거리
+RTT = pulseIn(echo, HIGH);
+dst = RTT * 340 / 2000
+
+// lcd.print(dst);      // 디스플레이 출력
+Serial.print(dst);      // 시리얼 출력
+
+delay(250);
+}
