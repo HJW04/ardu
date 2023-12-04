@@ -1,0 +1,149 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include "FirebaseESP8266.h"
+#include <ESP8266WiFi.h>
+
+
+#define TRIG D6    // 초음파 방출
+#define ECHO D7    // 초음파 반사 입력
+#define LED_PIN D13
+LiquidCrystal_I2C lcd(0x27,16,2);    // 주소 0x27, 16x2 디스플레이
+
+#define FIREBASE_HOST "skku-team5-default-rtdb.firebaseio.com"    //"skku-team5-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH "MMXM31jWhdTJAk1R2VL4rRgKbl6eScjLjpyj0sHM"          // "MMXM31jWhdTJAk1R2VL4rRgKbl6eScjLjpyj0sHM" 
+#define WIFI_SSID "Galaxy Z Flip 5GF5_42_51"   // wifi 이름: Galaxy Z Flip 5GF5_42_51
+#define WIFI_PASSWORD "28916195"  //wifi 비밀번호: 28916195
+
+FirebaseData fbd;    // firebase에 보낼 데이터
+FirebaseData fbdi;    // firebase에서 받을 데이터
+FirebaseJson json;    // 형식
+FirebaseConfig config;    // ID 설정
+FirebaseAuth auth;    // PW 설정
+
+void setup(){
+  Serial.begin(115200);   // 시리얼 통신, baud rate = 115200 bits / sec
+  
+  // wifi 연결
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);    
+  Serial.println("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {  // 연결 될때까지 1초간격으로 연결시도
+    Serial.print(".");
+    delay(1000);
+  }
+  Serial.println();
+  Serial.println("Connected with IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.println();
+
+  //firebase 연결
+  config.database_url = FIREBASE_HOST;
+  config.signer.tokens.legacy_token = FIREBASE_AUTH;
+  Firebase.reconnectWiFi(true);    // 재접속 허용 (true/false)
+  Firebase.begin(&config, &auth);   // 통신 시작
+
+  // LED 출력 설정
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, 0);
+  Firebase.setString(fbd, "LED", "N");
+
+  // 초음파 입출력 설정
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  
+  // lcd 시작
+  lcd.begin();
+  lcd.backlight();
+}
+
+float getVoltage(float inputA0){
+  float voltage = 4.2 * inputA0 / 1024 ;  // analog수치를 디지털 수치로 바꿈.
+  return voltage;
+}
+
+float getPercent(float voltage){
+  float percent = 100 * (voltage) / (4.2);
+   // 3.7V 배터리 전압 최고 4.2, 방전시 최소 2.4
+  percent= (int)(100*percent)/100.0;
+ 
+  return percent;
+}
+
+void printFirebase(float inputA0, float distance){
+  float voltage = getVoltage(inputA0);
+  float percent = getPercent(voltage);
+  float distance1 = getDistance();
+  //firebase에 데이터 전송
+  Firebase.setFloat(fbd, "voltage", voltage);   // "bucket이름/키", 값 
+  Firebase.setFloat(fbd, "percent", percent); 
+  Firebase.setFloat(fbd, "distance", distance1);
+
+}
+
+void readFirebase(){
+ 
+  //Serial.print(led);
+  //Serial.println();
+  if(Firebase.getString(fbdi,"LED")) {
+    String valLED = fbdi.stringData();
+    if (valLED == "true"){
+    digitalWrite(LED_PIN, HIGH);
+    }
+    if (valLED == "false"){
+    digitalWrite(LED_PIN, LOW);
+    }
+  } 
+}
+
+void printLcd(float inputA0, float distance){
+
+  lcd.clear();    // 화면을 지운다
+  
+  float voltage = getVoltage(inputA0);  
+  float percent = getPercent(voltage);   
+  
+  lcd.setCursor(0,0); 
+  //lcd.print(inputA0);
+  //lcd.print(" ");
+ 
+  lcd.print(percent);
+  lcd.print("%");
+
+  lcd.setCursor(0,1); 
+  //lcd.print(voltage);
+  //lcd.print("V ");
+ 
+  lcd.print(distance);
+  lcd.print("cm");
+
+}
+
+float getDistance(){
+  float duration;
+  float distance;
+  digitalWrite(TRIG, LOW);
+  digitalWrite(TRIG, HIGH);
+  delay(1);
+  digitalWrite(TRIG, LOW);
+  duration = pulseIn(ECHO, HIGH);
+  distance = ((float) (340 * duration) / 10000) / 2;
+  // Serial.print("Duration: ");
+  // Serial.print(duration);
+  // Serial.print(" Distance: ");
+  // Serial.print(distance);
+  // Serial.println("cm\n");
+
+  return distance;
+}
+
+void loop(){
+  float inputA0 = analogRead(0);  //0-1024 사이의 수치가 A0으로 들어옴.
+  float distance = getDistance();
+  printLcd(inputA0, distance);
+  printFirebase(inputA0, distance);
+  readFirebase();
+  //readFirebase();
+  delay(100);       // ( ) msec 동안 표시
+  lcd.clear();
+  delay(10);     // ( ) msec 동안 clear
+ 
+}
